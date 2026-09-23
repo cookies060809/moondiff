@@ -9,7 +9,7 @@ enum LineKind {
   Context
   Added
   Removed
-} deriving(Eq, Show, Debug)
+} derive(Eq, Debug)
 
 ///|
 /// diff 中的单行。
@@ -22,7 +22,7 @@ struct Line {
   content : String
   old_lineno : Int?
   new_lineno : Int?
-} deriving(Eq, Show, Debug)
+} derive(Eq, Debug)
 
 ///|
 /// 一个 `@@` 块。
@@ -38,7 +38,7 @@ struct Hunk {
   no_newline_old : Bool
   /// 标记 `\ No newline at end of file` 落在改动后的文件上
   no_newline_new : Bool
-} deriving(Eq, Show, Debug)
+} derive(Eq, Debug)
 
 ///|
 /// 这个文件整体发生了什么。
@@ -50,7 +50,7 @@ enum FileStatus {
   Copied
   /// 只改了权限，内容一行没动
   ModeOnly
-} deriving(Eq, Show, Debug)
+} derive(Eq, Debug)
 
 ///|
 /// 一个文件的完整改动记录。
@@ -65,146 +65,179 @@ struct FileDiff {
   old_mode : String?
   new_mode : String?
   hunks : Array[Hunk]
-} deriving(Eq, Show, Debug)
+} derive(Eq, Debug)
 
 ///|
 /// 一份完整的 diff，也就是 `git diff` 一次的输出。
 struct Diff {
   files : Array[FileDiff]
-} deriving(Eq, Show, Debug)
+} derive(Eq, Debug)
 
 ///|
-impl Line {
-  fn is_change(self : Line) -> Bool {
-    self.kind != Context
+// `derive` 出来的 trait 方法不会自动变成点号方法，要显式提升一次，
+// 调用方才能写 `a == b`。
+pub extend LineKind with Eq::{equal, not_equal}
+
+///|
+pub extend Line with Eq::{equal, not_equal}
+
+///|
+pub extend Hunk with Eq::{equal, not_equal}
+
+///|
+pub extend FileStatus with Eq::{equal, not_equal}
+
+///|
+pub extend FileDiff with Eq::{equal, not_equal}
+
+///|
+pub extend Diff with Eq::{equal, not_equal}
+
+///|
+pub extend LineKind with Debug::{to_repr}
+
+///|
+pub extend Line with Debug::{to_repr}
+
+///|
+pub extend Hunk with Debug::{to_repr}
+
+///|
+pub extend FileStatus with Debug::{to_repr}
+
+///|
+pub extend FileDiff with Debug::{to_repr}
+
+///|
+pub extend Diff with Debug::{to_repr}
+
+///|
+/// 是不是改动行（上下文行不算）。
+pub fn Line::is_change(self : Line) -> Bool {
+  self.kind != Context
+}
+
+///|
+pub fn Hunk::added(self : Hunk) -> Array[Line] {
+  self.lines.filter(fn(l) { l.kind == Added })
+}
+
+///|
+pub fn Hunk::removed(self : Hunk) -> Array[Line] {
+  self.lines.filter(fn(l) { l.kind == Removed })
+}
+
+///|
+/// 只看真正改动的行，跳过上下文
+pub fn Hunk::changed(self : Hunk) -> Array[Line] {
+  self.lines.filter(fn(l) { l.kind != Context })
+}
+
+///|
+pub fn Hunk::added_count(self : Hunk) -> Int {
+  self.added().length()
+}
+
+///|
+pub fn Hunk::removed_count(self : Hunk) -> Int {
+  self.removed().length()
+}
+
+///|
+/// 重建「改动前」的代码片段：上下文 + 删除行。
+pub fn Hunk::old_side_text(self : Hunk) -> String {
+  self.side_text(Added)
+}
+
+///|
+/// 重建「改动后」的代码片段：上下文 + 新增行。
+/// 喂给大模型看的应该就是这段。
+pub fn Hunk::new_side_text(self : Hunk) -> String {
+  self.side_text(Removed)
+}
+
+///|
+fn Hunk::side_text(self : Hunk, exclude : LineKind) -> String {
+  let buf : Array[String] = []
+  for l in self.lines {
+    if l.kind != exclude {
+      buf.push(l.content)
+    }
+  }
+  buf.join("\n")
+}
+
+///|
+/// 展示用的路径：优先给改动后的，被删除的文件退回改动前的。
+pub fn FileDiff::display_path(self : FileDiff) -> String {
+  if self.new_path == "/dev/null" {
+    self.old_path
+  } else {
+    self.new_path
   }
 }
 
 ///|
-impl Hunk {
-  fn added(self : Hunk) -> Array[Line] {
-    self.lines.filter(fn(l) { l.kind == Added })
+pub fn FileDiff::changed_line_count(self : FileDiff) -> Int {
+  let mut n = 0
+  for h in self.hunks {
+    n = n + h.changed().length()
   }
-
-  fn removed(self : Hunk) -> Array[Line] {
-    self.lines.filter(fn(l) { l.kind == Removed })
-  }
-
-  /// 只看真正改动的行，跳过上下文
-  fn changed(self : Hunk) -> Array[Line] {
-    self.lines.filter(fn(l) { l.kind != Context })
-  }
-
-  fn added_count(self : Hunk) -> Int {
-    self.added().length
-  }
-
-  fn removed_count(self : Hunk) -> Int {
-    self.removed().length
-  }
-
-  /// 重建「改动前」的代码片段：上下文 + 删除行。
-  fn old_side_text(self : Hunk) -> String {
-    self.side_text(exclude=Removed)
-  }
-
-  /// 重建「改动后」的代码片段：上下文 + 新增行。
-  /// 喂给大模型看的应该就是这段。
-  fn new_side_text(self : Hunk) -> String {
-    self.side_text(exclude=Added)
-  }
-
-  private fn side_text(self : Hunk, exclude : LineKind) -> String {
-    let buf = Array::new()
-    for l in self.lines {
-      if l.kind != exclude {
-        buf.push(l.content)
-      }
-    }
-    join_lines(buf)
-  }
+  n
 }
 
 ///|
-impl FileDiff {
-  /// 展示用的路径：优先给改动后的，被删除的文件退回改动前的。
-  fn display_path(self : FileDiff) -> String {
-    if self.new_path == "/dev/null" {
-      self.old_path
-    } else {
-      self.new_path
-    }
-  }
-
-  fn changed_line_count(self : FileDiff) -> Int {
-    let mut n = 0
-    for h in self.hunks {
-      n = n + h.changed().length
-    }
-    n
-  }
+pub fn Diff::empty() -> Diff {
+  { files: [], }
 }
 
 ///|
-impl Diff {
-  fn empty() -> Diff {
-    { files: Array::new() }
-  }
-
-  fn is_empty(self : Diff) -> Bool {
-    self.files.is_empty()
-  }
-
-  fn file_count(self : Diff) -> Int {
-    self.files.length
-  }
-
-  fn hunk_count(self : Diff) -> Int {
-    let mut n = 0
-    for f in self.files {
-      n = n + f.hunks.length
-    }
-    n
-  }
-
-  fn added_count(self : Diff) -> Int {
-    let mut n = 0
-    for f in self.files {
-      for h in f.hunks {
-        n = n + h.added_count()
-      }
-    }
-    n
-  }
-
-  fn removed_count(self : Diff) -> Int {
-    let mut n = 0
-    for f in self.files {
-      for h in f.hunks {
-        n = n + h.removed_count()
-      }
-    }
-    n
-  }
-
-  /// 这次改动碰到了哪些文件
-  fn touched_paths(self : Diff) -> Array[String] {
-    let out = Array::new()
-    for f in self.files {
-      out.push(f.display_path())
-    }
-    out
-  }
+pub fn Diff::is_empty(self : Diff) -> Bool {
+  self.files.is_empty()
 }
 
 ///|
-fn join_lines(parts : Array[String]) -> String {
-  let buf = Buffer::new()
-  for i = 0; i < parts.length; i = i + 1 {
-    if i > 0 {
-      buf.push_char('\n')
-    }
-    buf.append_string(parts[i])
+pub fn Diff::file_count(self : Diff) -> Int {
+  self.files.length()
+}
+
+///|
+pub fn Diff::hunk_count(self : Diff) -> Int {
+  let mut n = 0
+  for f in self.files {
+    n = n + f.hunks.length()
   }
-  buf.to_string()
+  n
+}
+
+///|
+pub fn Diff::added_count(self : Diff) -> Int {
+  let mut n = 0
+  for f in self.files {
+    for h in f.hunks {
+      n = n + h.added_count()
+    }
+  }
+  n
+}
+
+///|
+pub fn Diff::removed_count(self : Diff) -> Int {
+  let mut n = 0
+  for f in self.files {
+    for h in f.hunks {
+      n = n + h.removed_count()
+    }
+  }
+  n
+}
+
+///|
+/// 这次改动碰到了哪些文件
+pub fn Diff::touched_paths(self : Diff) -> Array[String] {
+  let out : Array[String] = []
+  for f in self.files {
+    out.push(f.display_path())
+  }
+  out
 }

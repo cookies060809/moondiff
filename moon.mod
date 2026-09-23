@@ -19,7 +19,7 @@ repository = "https://github.com/cookies060809/moondiff"
 
 license = "Apache-2.0"
 
-keywords = ["diff", "unified-diff", "git", "code-review", "cli", "parser"]
+keywords = [ "diff", "unified-diff", "git", "code-review", "cli", "parser" ]
 
 preferred_target = "native"
 
