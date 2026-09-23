@@ -9,7 +9,7 @@
 
 ///|
 /// 解析失败。`BadDiff(行号, 说明)`，行号从 1 开始，指向出错的源文本行。
-suberror DiffError {
+pub suberror DiffError {
   BadDiff(Int, String)
 } derive(Eq, Debug)
 
