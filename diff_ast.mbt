@@ -187,6 +187,24 @@ pub fn FileDiff::changed_line_count(self : FileDiff) -> Int {
 }
 
 ///|
+pub fn FileDiff::added_count(self : FileDiff) -> Int {
+  let mut n = 0
+  for h in self.hunks {
+    n = n + h.added_count()
+  }
+  n
+}
+
+///|
+pub fn FileDiff::removed_count(self : FileDiff) -> Int {
+  let mut n = 0
+  for h in self.hunks {
+    n = n + h.removed_count()
+  }
+  n
+}
+
+///|
 pub fn Diff::empty() -> Diff {
   { files: [], }
 }
