@@ -10,13 +10,13 @@ enum Mode {
   Stat
   Detail
   Check
-}
+} derive(Eq, Debug)
 
 ///|
 struct Flags {
   mode : Mode
   paths : Array[String]
-}
+} derive(Eq, Debug)
 
 ///|
 enum Parsed {
@@ -24,7 +24,7 @@ enum Parsed {
   ShowVersion
   Run(Flags)
   UsageError(String)
-}
+} derive(Eq, Debug)
 
 ///|
 let version : String = "0.1.0"
