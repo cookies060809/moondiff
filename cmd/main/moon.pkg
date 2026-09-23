@@ -1,0 +1,5 @@
+// import {
+//   "username/moondiff" @lib,
+// }
+
+pkgtype(kind: "executable")
