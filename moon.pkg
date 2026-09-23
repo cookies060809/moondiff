@@ -1,4 +1,8 @@
 // 根包是库包（默认 pkgtype kind: "lib"），无需显式声明 pkgtype。
 //
-// 没有依赖。连 JSON 也不用 import `moonbitlang/core/json`：`Json` 类型和
-// `stringify` 都在 builtin 里，显式加进去反而被报成 unused_package。
+// `Json` 类型和 `stringify` 在 builtin 里，造 JSON 不用 import。
+// 只有解析接口响应要用 `moonbitlang/core/json` 的 parse，所以只 import 它。
+
+import {
+  "moonbitlang/core/json",
+}

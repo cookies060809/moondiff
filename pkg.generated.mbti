@@ -6,13 +6,31 @@ import {
 }
 
 // Values
+pub let body_file : String
+
+pub fn chat_endpoint(String) -> String
+
+pub fn chat_reply(String) -> (Bool, String)
+
 pub fn clean_path(String) -> String
+
+pub let config_file : String
+
+pub let curl_command : String
+
+pub fn curl_config(String, String) -> String
 
 pub fn parse_diff(String) -> Diff raise DiffError
 
 pub fn parse_hunk_header(String, Int) -> HunkHeader raise DiffError
 
 pub fn read_two_paths(String) -> (String, String)
+
+pub fn resolve_base_url(String?) -> String
+
+pub fn resolve_model(String?) -> String
+
+pub let response_file : String
 
 pub fn split_lines(String) -> Array[String]
 
@@ -27,6 +45,7 @@ pub fn DiffError::to_repr(Self) -> @debug.Repr
 // Types and methods
 type Diff derive(Eq, @debug.Debug)
 pub fn Diff::added_count(Self) -> Int
+pub fn Diff::chat_body(Self, String) -> String
 pub fn Diff::empty() -> Self
 pub fn Diff::equal(Self, Self) -> Bool
 pub fn Diff::file_count(Self) -> Int
