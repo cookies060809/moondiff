@@ -2,15 +2,24 @@
 package "cookies060809/moondiff/cmd/main"
 
 import {
+  "cookies060809/moondiff",
   "moonbitlang/core/debug",
 }
 
 // Values
+pub fn ask_for_review(@moondiff.Diff) -> (Bool, String) raise IoError
+
 pub fn exit_with(Int) -> Unit
 
 pub fn read_file(String) -> String raise IoError
 
 pub fn read_stdin() -> String raise IoError
+
+pub fn remove_file(String) -> Unit
+
+pub fn run_command(String) -> Int
+
+pub fn write_text_file(String, String) -> Unit raise IoError
 
 // Errors
 type IoError

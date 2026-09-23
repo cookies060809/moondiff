@@ -17,7 +17,14 @@ test "each output flag picks its mode" {
   assert_eq(parse_args(["-d"]), run_with(Detail, []))
   assert_eq(parse_args(["--detail"]), run_with(Detail, []))
   assert_eq(parse_args(["--check"]), run_with(Check, []))
-  assert_eq(parse_args(["--review-prompt"]), run_with(Review, []))
+  assert_eq(parse_args(["--review-prompt"]), run_with(Prompt, []))
+}
+
+///|
+test "the online and offline review flags stay separate" {
+  assert_eq(parse_args(["--review"]), run_with(Review, []))
+  assert_eq(parse_args(["--review", "--review-prompt"]), run_with(Prompt, []))
+  assert_eq(parse_args(["--review-prompt", "--review"]), run_with(Review, []))
 }
 
 ///|

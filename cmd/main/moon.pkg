@@ -10,5 +10,7 @@ options(
   targets: {
     "io_native.mbt": [ "native", "llvm" ],
     "io_other.mbt": [ "wasm", "wasm-gc", "js" ],
+    "net_native.mbt": [ "native", "llvm" ],
+    "net_other.mbt": [ "wasm", "wasm-gc", "js" ],
   },
 )

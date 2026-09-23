@@ -2,7 +2,7 @@
 ///
 /// 退出码约定和大多数 Unix 工具一致：
 ///   0 正常（--check 时表示这份 diff 干净）
-///   1 --check 下发现了改动
+///   1 --check 下发现了改动，或者 --review 没拿到模型的意见
 ///   2 用法错误、读不到输入、或者 diff 本身解析失败
 
 ///|
@@ -11,6 +11,7 @@ enum Mode {
   Detail
   Check
   Json
+  Prompt
   Review
 } derive(Eq, Debug)
 
@@ -45,9 +46,15 @@ fn print_help() -> Unit {
     "  --detail, -d    逐文件打印状态、hunk 头和每一行",
     "  --json          输出结构化 JSON，给别的程序读",
     "  --review-prompt 输出给大模型评审用的提示词（不调模型，只生成文本）",
+    "  --review        把提示词发给模型并打印它的意见（要 curl 和外网）",
     "  --check         只校验能不能解析，不输出内容",
     "  -h, --help      显示这份帮助",
     "  -V, --version   显示版本",
+    "",
+    "--review 读这些环境变量：",
+    "  MOONDIFF_API_KEY   必填，等同于 OPENAI_API_KEY",
+    "  MOONDIFF_BASE_URL  接口地址，默认商汤 SenseNova 的 OpenAI 兼容端点",
+    "  MOONDIFF_MODEL     模型名，默认 sensenova-6.7-flash-lite",
     "",
     "退出码: 0 成功 / 1 --check 发现有改动 / 2 用法或解析错误",
   ].join("\n")
@@ -78,6 +85,8 @@ fn parse_args(argv : Array[String]) -> Parsed {
     } else if a == "--json" {
       mode = Json
     } else if a == "--review-prompt" {
+      mode = Prompt
+    } else if a == "--review" {
       mode = Review
     } else if a == "--check" {
       mode = Check
@@ -106,13 +115,36 @@ fn read_all(paths : Array[String]) -> String raise IoError {
 }
 
 ///|
-fn render(d : @diff.Diff, mode : Mode) -> Unit {
+/// 打印并给出这个模式的退出码。`--review` 是唯一会联网的模式，
+/// 它失败也算 1，和 `--check` 发现改动一样表示「有问题要看」。
+fn render(d : @diff.Diff, mode : Mode) -> Int raise IoError {
   match mode {
-    Stat => println(d.format_stat())
-    Detail => println(d.format_detail())
-    Json => println(d.format_json())
-    Review => println(d.review_prompt())
-    Check => ()
+    Stat => {
+      println(d.format_stat())
+      0
+    }
+    Detail => {
+      println(d.format_detail())
+      0
+    }
+    Json => {
+      println(d.format_json())
+      0
+    }
+    Prompt => {
+      println(d.review_prompt())
+      0
+    }
+    Review => {
+      let (ok, text) = ask_for_review(d)
+      println(text)
+      if ok {
+        0
+      } else {
+        1
+      }
+    }
+    Check => if d.is_empty() { 0 } else { 1 }
   }
 }
 
@@ -129,10 +161,6 @@ fn run_flags(flags : Flags) -> Int raise IoError {
   let text = read_all(flags.paths)
   let d = parse_text(text)
   render(d, flags.mode)
-  match flags.mode {
-    Check => if d.is_empty() { 0 } else { 1 }
-    _ => 0
-  }
 }
 
 ///|

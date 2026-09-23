@@ -7,3 +7,8 @@ target
 
 # 项目申报书只交给主办方，不进公开仓库
 PROPOSAL.md
+
+# --review 的临时文件：其中一个含密钥，跑完会删，中断了也别被提交
+.moondiff-review-body.json
+.moondiff-review-curl.cfg
+.moondiff-review-response.json
