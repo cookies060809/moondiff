@@ -4,3 +4,6 @@ target/
 target
 .mooncakes/
 .moonagent/
+
+# 项目申报书只交给主办方，不进公开仓库
+PROPOSAL.md
