@@ -1,5 +1,5 @@
 // 命令行参数解析的白盒测试。只测 parse_args 和错误文案，
-// 不碰 stdin——那部分要在真进程里测，放在脚本里。
+// 不碰 stdin——那部分在真进程里测，见 scripts/smoke.sh。
 
 ///|
 fn run_with(mode : Mode, paths : Array[String]) -> Parsed {

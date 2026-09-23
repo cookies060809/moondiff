@@ -11,6 +11,7 @@ MoonBit 写的，库那层是纯函数，不碰文件也不碰网络；命令行
 ```bash
 moon build cmd/main          # 产物在 _build/native/debug/build/cmd/main/main.exe
 moon test                    # 60 个测试
+bash scripts/smoke.sh        # 真进程冒烟：stdin、退出码、临时文件清理
 ```
 
 也可以直接跑：`moon run cmd/main -- --stat`。
