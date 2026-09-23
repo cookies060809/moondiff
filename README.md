@@ -10,7 +10,7 @@ MoonBit 写的，解析层是纯函数，不碰文件也不碰网络；命令行
 
 ```bash
 moon build cmd/main          # 产物在 _build/native/debug/build/cmd/main/main.exe
-moon test                    # 39 个测试
+moon test                    # 42 个测试
 ```
 
 也可以直接跑：`moon run cmd/main -- --stat`。
@@ -31,6 +31,7 @@ moondiff --check pr.diff
 | --- | --- |
 | 默认 / `--stat` | 每个文件一行变更量，末尾给总计，形式同 `git diff --stat` |
 | `--detail` / `-d` | 逐文件打印状态、hunk 头和每一行的 +/- |
+| `--json` | 输出结构化 JSON，字段固定，给别的程序读 |
 | `--check` | 不输出内容，只用退出码告诉你这份 diff 干不干净 |
 | `-h` / `-V` | 帮助、版本 |
 
@@ -60,6 +61,41 @@ new file  src/logo.png
 renamed  src/renamed.txt
 ```
 
+同一份 diff 的 `--json`（只留 `src/a.txt` 那个 hunk 的开头，其余用 `…` 省略）：
+
+```json
+{
+  "summary": { "file_count": 3, "hunk_count": 1, "added": 2, "removed": 1 },
+  "files": [
+    {
+      "old_path": "src/a.txt",
+      "new_path": "src/a.txt",
+      "path": "src/a.txt",
+      "status": "modified",
+      "binary": false,
+      "old_mode": null,
+      "new_mode": null,
+      "added": 2,
+      "removed": 1,
+      "hunks": [
+        {
+          "old_start": 1, "old_count": 3, "new_start": 1, "new_count": 4,
+          "heading": "",
+          "no_newline_old": false, "no_newline_new": false,
+          "lines": [
+            { "kind": "context", "old_line": 1, "new_line": 1, "content": "alpha" },
+            { "kind": "removed", "old_line": 2, "new_line": null, "content": "beta" },
+            { "kind": "added", "old_line": null, "new_line": 2, "content": "BETA" },
+            …
+          ]
+        }
+      ]
+    },
+    …
+  ]
+}
+```
+
 ## 库
 
 `moon.pkg` 里给包起个别名，调用时走 `@别名.`（当前 MoonBit 版本没有 `包名::名字` 这种写法）：
@@ -85,7 +121,6 @@ d.touched_paths()                     // 这次动过的文件
 
 ## 还没做的
 
-- `--json` 输出还没做，接机器消费时需要。
 - 调模型做自动评审的那一层没开始。
 - 只解析，不应用 diff，也不生成 diff（生成请用 `moonbitlang/core` 自带的 `diff` 模块，它只能生成不能解析，这两件事不冲突）。
 

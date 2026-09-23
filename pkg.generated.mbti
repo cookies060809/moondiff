@@ -17,7 +17,9 @@ pub fn read_two_paths(String) -> (String, String)
 pub fn split_lines(String) -> Array[String]
 
 // Errors
-type DiffError derive(Eq, @debug.Debug)
+pub suberror DiffError {
+  BadDiff(Int, String)
+} derive(Eq, @debug.Debug)
 pub fn DiffError::equal(Self, Self) -> Bool
 pub fn DiffError::not_equal(Self, Self) -> Bool
 pub fn DiffError::to_repr(Self) -> @debug.Repr
@@ -29,11 +31,13 @@ pub fn Diff::empty() -> Self
 pub fn Diff::equal(Self, Self) -> Bool
 pub fn Diff::file_count(Self) -> Int
 pub fn Diff::format_detail(Self) -> String
+pub fn Diff::format_json(Self) -> String
 pub fn Diff::format_stat(Self) -> String
 pub fn Diff::hunk_count(Self) -> Int
 pub fn Diff::is_empty(Self) -> Bool
 pub fn Diff::not_equal(Self, Self) -> Bool
 pub fn Diff::removed_count(Self) -> Int
+pub fn Diff::to_json(Self) -> Json
 pub fn Diff::to_repr(Self) -> @debug.Repr
 pub fn Diff::touched_paths(Self) -> Array[String]
 

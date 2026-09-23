@@ -1,5 +1,4 @@
 // 根包是库包（默认 pkgtype kind: "lib"），无需显式声明 pkgtype。
 //
-// 目前没有依赖：`Debug` 和快照断言用的 `debug_inspect` 都由 core 在测试
-// target 下自动提供，在这里显式 import "moonbitlang/core/debug" 反而会被
-// 报成 unused_package。等接上 CLI / HTTP 那一层再补进来。
+// 没有依赖。连 JSON 也不用 import `moonbitlang/core/json`：`Json` 类型和
+// `stringify` 都在 builtin 里，显式加进去反而被报成 unused_package。

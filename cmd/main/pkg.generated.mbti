@@ -1,11 +1,29 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "cookies060809/moondiff/cmd/main"
 
+import {
+  "moonbitlang/core/debug",
+}
+
 // Values
+pub fn exit_with(Int) -> Unit
+
+pub fn read_file(String) -> String raise IoError
+
+pub fn read_stdin() -> String raise IoError
 
 // Errors
+type IoError
+pub fn IoError::message(Self) -> String
 
 // Types and methods
+type FileHandle
+
+type Flags derive(Eq, @debug.Debug)
+
+type Mode derive(Eq, @debug.Debug)
+
+type Parsed derive(Eq, @debug.Debug)
 
 // Type aliases
 
