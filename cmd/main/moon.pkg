@@ -1,5 +1,14 @@
-// import {
-//   "username/moondiff" @lib,
-// }
+import {
+  "cookies060809/moondiff" @diff,
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/env",
+}
 
 pkgtype(kind: "executable")
+
+options(
+  targets: {
+    "io_native.mbt": [ "native", "llvm" ],
+    "io_other.mbt": [ "wasm", "wasm-gc", "js" ],
+  },
+)
