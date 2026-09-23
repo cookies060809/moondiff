@@ -1,13 +1,12 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "cookies060809/moondiff/cmd/main"
+package "cookies060809/moonreview/cmd/moonreview"
 
 import {
-  "cookies060809/moondiff",
   "moonbitlang/core/debug",
 }
 
 // Values
-pub fn ask_for_review(@moondiff.Diff) -> (Bool, String) raise IoError
+pub fn ask_for_review(@cookies060809/moonreview.Diff) -> (Bool, String) raise IoError
 
 pub fn exit_with(Int) -> Unit
 

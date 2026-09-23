@@ -35,9 +35,9 @@ let version : String = "0.1.0"
 ///|
 fn print_help() -> Unit {
   [
-    "moondiff \{version} —— 解析 unified diff",
+    "moonreview \{version} —— 解析 unified diff",
     "",
-    "用法: moondiff [选项] [文件 ...]",
+    "用法: moonreview [选项] [文件 ...]",
     "",
     "不给文件、或者给 `-` 时从标准输入读。多个文件的内容会按顺序拼起来。",
     "",
@@ -52,9 +52,9 @@ fn print_help() -> Unit {
     "  -V, --version   显示版本",
     "",
     "--review 读这些环境变量：",
-    "  MOONDIFF_API_KEY   必填，等同于 OPENAI_API_KEY",
-    "  MOONDIFF_BASE_URL  接口地址，默认商汤 SenseNova 的 OpenAI 兼容端点",
-    "  MOONDIFF_MODEL     模型名，默认 sensenova-6.7-flash-lite",
+    "  MOONREVIEW_API_KEY   必填，等同于 OPENAI_API_KEY",
+    "  MOONREVIEW_BASE_URL  接口地址，默认商汤 SenseNova 的 OpenAI 兼容端点",
+    "  MOONREVIEW_MODEL     模型名，默认 sensenova-6.7-flash-lite",
     "",
     "退出码: 0 成功 / 1 --check 发现有改动 / 2 用法或解析错误",
   ].join("\n")
@@ -172,17 +172,17 @@ fn run(argv : Array[String]) -> Int {
       0
     }
     ShowVersion => {
-      println("moondiff \{version}")
+      println("moonreview \{version}")
       0
     }
     UsageError(msg) => {
-      eprintln("moondiff: \{msg}")
+      eprintln("moonreview: \{msg}")
       2
     }
     Run(flags) =>
       run_flags(flags) catch {
         err => {
-          eprintln("moondiff: \{err.message()}")
+          eprintln("moonreview: \{err.message()}")
           2
         }
       }

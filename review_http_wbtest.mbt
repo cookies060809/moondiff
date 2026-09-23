@@ -26,10 +26,10 @@ test "curl_config keeps the key on one line and out of the command" {
   assert_true(cfg.has_prefix("silent\nshow-error\n"))
   assert_true(cfg.contains("url = \"https://api.example/v1/chat/completions\""))
   assert_true(cfg.contains("header = \"Authorization: Bearer sk-test\""))
-  assert_true(cfg.contains("data-binary = \"@.moondiff-review-body.json\""))
-  assert_true(cfg.contains("output = \".moondiff-review-response.json\""))
+  assert_true(cfg.contains("data-binary = \"@.moonreview-body.json\""))
+  assert_true(cfg.contains("output = \".moonreview-response.json\""))
   // 命令是常量：diff 内容和密钥都不会出现在进程列表里
-  assert_eq(curl_command, "curl -K .moondiff-review-curl.cfg")
+  assert_eq(curl_command, "curl -K .moonreview-curl.cfg")
 }
 
 ///|

@@ -19,7 +19,7 @@ pub fn read_file(path : String) -> String raise IoError {
 pub fn exit_with(code : Int) -> Unit {
   if code != 0 {
     eprintln(
-      "moondiff: 退出码 \{code}（当前构建目标无法设置退出码）",
+      "moonreview: 退出码 \{code}（当前构建目标无法设置退出码）",
     )
   }
 }

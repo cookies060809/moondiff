@@ -1,4 +1,4 @@
-# moondiff
+# moonreview
 
 把 `git diff` 吐出来的 unified diff 文本解析成结构化数据，再渲染成人能看的改动摘要。
 
@@ -9,23 +9,23 @@ MoonBit 写的，库那层是纯函数，不碰文件也不碰网络；命令行
 需要 MoonBit 工具链（`moon`）。装好后：
 
 ```bash
-moon build cmd/main          # 产物在 _build/native/debug/build/cmd/main/main.exe
+moon build cmd/moonreview    # 产物在 _build/native/debug/build/cmd/moonreview/moonreview.exe
 moon test                    # 60 个测试
 bash scripts/smoke.sh        # 真进程冒烟：stdin、退出码、临时文件清理
 ```
 
-也可以直接跑：`moon run cmd/main -- --stat`。
+也可以直接跑：`moon run cmd/moonreview -- --stat`。
 
-当作库引入：`moon add cookies060809/moondiff`。
+当作库引入：`moon add cookies060809/moonreview`。
 
 ## 命令行
 
 不传文件名时从标准输入读，`-` 也表示标准输入，给多个文件会把内容按顺序拼起来。
 
 ```bash
-git diff HEAD~1 HEAD | moondiff
-moondiff --detail commit.diff
-moondiff --check pr.diff
+git diff HEAD~1 HEAD | moonreview
+moonreview --detail commit.diff
+moonreview --check pr.diff
 ```
 
 | 选项 | 作用 |
@@ -46,16 +46,16 @@ moondiff --check pr.diff
 
 | 变量 | 含义 |
 | --- | --- |
-| `MOONDIFF_API_KEY` | 必填，没设时退而读 `OPENAI_API_KEY` |
-| `MOONDIFF_BASE_URL` | 接口地址，默认 `https://token.sensenova.cn/v1`（商汤 SenseNova） |
-| `MOONDIFF_MODEL` | 模型名，默认 `sensenova-6.7-flash-lite` |
+| `MOONREVIEW_API_KEY` | 必填，没设时退而读 `OPENAI_API_KEY` |
+| `MOONREVIEW_BASE_URL` | 接口地址，默认 `https://token.sensenova.cn/v1`（商汤 SenseNova） |
+| `MOONREVIEW_MODEL` | 模型名，默认 `sensenova-6.7-flash-lite` |
 
 ```bash
-export MOONDIFF_API_KEY=...
-git diff HEAD~1 HEAD | moondiff --review
+export MOONREVIEW_API_KEY=...
+git diff HEAD~1 HEAD | moonreview --review
 ```
 
-MoonBit 的 native 后端没有 HTTPS 标准库，所以这一层是就地把请求体和 curl 配置写成当前目录下的隐藏临时文件，执行 `curl -K .moondiff-review-curl.cfg`，读回响应再删掉文件。两个刻意的取舍：
+MoonBit 的 native 后端没有 HTTPS 标准库，所以这一层是就地把请求体和 curl 配置写成当前目录下的隐藏临时文件，执行 `curl -K .moonreview-curl.cfg`，读回响应再删掉文件。两个刻意的取舍：
 
 - 密钥只出现在配置文件里，不进命令行参数。进程列表是整机可见的。
 - 要执行的命令是一个常量字符串，diff 内容和密钥都不会被拼进去，所以交给 shell 没有注入面。
@@ -66,16 +66,16 @@ MoonBit 的 native 后端没有 HTTPS 标准库，所以这一层是就地把请
 
 ## 例子
 
-下面是一份真实的 `git diff` 输出（一个文件有改动、一个二进制新文件、一个改名），过 `moondiff` 的结果：
+下面是一份真实的 `git diff` 输出（一个文件有改动、一个二进制新文件、一个改名），过 `moonreview` 的结果：
 
 ```
-$ moondiff --stat sample.diff
+$ moonreview --stat sample.diff
        src/a.txt |    3 ++-
     src/logo.png |    0
  src/renamed.txt |    0
 3 files changed, 2 insertion(+), 1 deletion(-)
 
-$ moondiff -d sample.diff
+$ moonreview -d sample.diff
 modified  src/a.txt
 @@ -1,3 +1,4 @@
  alpha
@@ -128,19 +128,19 @@ renamed  src/renamed.txt
 `moon.pkg` 里给包起个别名，调用时走 `@别名.`（当前 MoonBit 版本没有 `包名::名字` 这种写法）：
 
 ```moonbit
-// import { "cookies060809/moondiff" @moondiff, }
+// import { "cookies060809/moonreview" @moonreview, }
 
-let d = @moondiff.parse_diff(text)   // 失败 raise DiffError::BadDiff(行号, 说明)
+let d = @moonreview.parse_diff(text)   // 失败 raise DiffError::BadDiff(行号, 说明)
 d.format_stat()                      // 上面那份摘要
 d.format_detail()                    // 上面那份逐行输出
 d.file_count()
 d.hunk_count()
 d.added_count()
 d.removed_count()
-d.touched_paths()                     // 这次动过的文件
-d.review_prompt()                      // 给模型看的评审提示词（纯文本，不联网）
-d.chat_body("模型名")                  // 同一个提示词拆成 chat 请求体
-@moondiff.chat_reply(raw)              // 把接口响应解成 (成功?, 文本)
+d.touched_paths()                    // 这次动过的文件
+d.review_prompt()                    // 给模型看的评审提示词（纯文本，不联网）
+d.chat_body("模型名")                 // 同一个提示词拆成 chat 请求体
+@moonreview.chat_reply(raw)          // 把接口响应解成 (成功?, 文本)
 ```
 
 数据结构是 `Diff` → `FileDiff` → `Hunk` → `Line`，`Line` 带 `old_line` / `new_line` 两个行号，所以拿到意见之后能准确回指到文件的某一行。

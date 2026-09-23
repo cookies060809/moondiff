@@ -1,5 +1,5 @@
 import {
-  "cookies060809/moondiff" @diff,
+  "cookies060809/moonreview" @diff,
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/env",
 }

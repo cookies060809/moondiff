@@ -1,4 +1,4 @@
-# cookies060809/moondiff
+# cookies060809/moonreview
 
 unified diff 文本解析器。`parse_diff` 把 `git diff` 的输出读成 `Diff` / `FileDiff` /
 `Hunk` / `Line`，每一行都带改动前和改动后的行号；`format_stat` 和 `format_detail`
@@ -8,4 +8,4 @@ unified diff 文本解析器。`parse_diff` 把 `git diff` 的输出读成 `Diff
 不会被误认成文件头。`review_prompt` 和 `chat_body` 把同一份数据渲染成给大模型的
 评审提示词和请求体，`chat_reply` 解接口响应——这几步也全是纯函数，只用到标准库。
 
-命令行用法和完整说明见仓库：<https://github.com/cookies060809/moondiff>。
+命令行用法和完整说明见仓库：<https://github.com/cookies060809/moonreview>。

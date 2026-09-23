@@ -11,7 +11,7 @@ trap 'rm -f "$BAD"' EXIT
 fail=0
 
 moon build --target native >/dev/null 2>&1 || { echo "构建失败"; exit 1; }
-EXE=$(find _build/native -name 'main.exe' -o -name 'main' -type f | grep -v '\.c$' | head -1)
+EXE=$(find _build/native/debug/build -type f \( -name 'moonreview.exe' -o -name 'moonreview' \) | head -1)
 [ -n "$EXE" ] || { echo "找不到 native 可执行文件"; exit 1; }
 
 check() { # check <说明> <期望退出码> <命令...>
@@ -55,7 +55,7 @@ check "--detail 返回 0"          0 "$EXE" -d "$SAMPLE"
 check "-h 返回 0"                 0 "$EXE" --help
 check "-V 返回 0"                 0 "$EXE" --version
 check "未知选项返回 2"           2 "$EXE" --nope
-check "解析失败返回 2"           2 "$EXE" bad.diff
+check "解析失败返回 2"           2 "$EXE" "$BAD"
 check "读不到的文件返回 2"       2 "$EXE" does-not-exist.diff
 check "空输入 --check 返回 0"     0 sh -c "printf '' | $EXE --check -"
 # 输出内容
@@ -64,10 +64,10 @@ expect_out "--detail 带 hunk 头"  "@@ -1,3 +1,4 @@"      "$EXE" --detail "$SAM
 expect_out "--json 有 summary"    '"file_count": 3'      "$EXE" --json "$SAMPLE"
 expect_out "--review-prompt 带行号列和输出约定" "LGTM"    "$EXE" --review-prompt "$SAMPLE"
 # --review 在没有密钥时不该碰网络，也不该留下临时文件
-rm -f .moondiff-review-body.json .moondiff-review-curl.cfg .moondiff-review-response.json
-expect_out "--review 缺密钥时给出提示" "MOONDIFF_API_KEY" \
-  env -u MOONDIFF_API_KEY -u OPENAI_API_KEY "$EXE" --review "$SAMPLE"
-leftovers=$(ls -a | grep '^\.moondiff-review' || true)
+rm -f .moonreview-body.json .moonreview-curl.cfg .moonreview-response.json
+expect_out "--review 缺密钥时给出提示" "MOONREVIEW_API_KEY" \
+  env -u MOONREVIEW_API_KEY -u OPENAI_API_KEY "$EXE" --review "$SAMPLE"
+leftovers=$(ls -a | grep '^\.moonreview-' || true)
 if [ -z "$leftovers" ]; then
   echo "ok   没有残留临时文件"
 else

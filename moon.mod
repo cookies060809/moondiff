@@ -9,13 +9,13 @@
 //   "moonbitlang/x@0.4.6",
 // }
 
-name = "cookies060809/moondiff"
+name = "cookies060809/moonreview"
 
 version = "0.1.0"
 
 readme = "README.mbt.md"
 
-repository = "https://github.com/cookies060809/moondiff"
+repository = "https://github.com/cookies060809/moonreview"
 
 license = "Apache-2.0"
 

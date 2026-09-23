@@ -1,7 +1,7 @@
 // 联网评审的数据层：造请求体、造 curl 配置、解析响应。
 //
 // 这一整层都是纯函数——不联网、不碰文件，所以能离线跑测试。真正调 curl 的那半
-// 在 cmd/main，因为 MoonBit 的 native 目标没有 HTTPS 标准库，发请求只能借外部
+// 在 cmd/moonreview，因为 MoonBit 的 native 目标没有 HTTPS 标准库，发请求只能借外部
 // 程序；把「发什么」和「怎么发」分开，换供应商时只需要改常量和环境变量。
 //
 // 一个刻意的取舍：API Key 只写进 curl 配置文件，绝不出现在命令行参数里。
@@ -9,7 +9,7 @@
 
 ///|
 /// 供应商相关的默认值。用 OpenAI 兼容接口的服务都能跑，
-/// 靠 MOONDIFF_BASE_URL / MOONDIFF_MODEL 覆盖成自己那家。
+/// 靠 MOONREVIEW_BASE_URL / MOONREVIEW_MODEL 覆盖成自己那家。
 let default_base_url : String = "https://token.sensenova.cn/v1"
 
 ///|
@@ -19,13 +19,13 @@ let default_model : String = "sensenova-6.7-flash-lite"
 /// 请求体、curl 配置、响应都落在当前目录的隐藏文件里：
 /// 用相对路径可以绕开 Windows 反斜杠在 curl 配置里被当转义符的坑，
 /// 也让命令本身变成一个不含任何外部输入的固定字符串。
-pub let body_file : String = ".moondiff-review-body.json"
+pub let body_file : String = ".moonreview-body.json"
 
 ///|
-pub let config_file : String = ".moondiff-review-curl.cfg"
+pub let config_file : String = ".moonreview-curl.cfg"
 
 ///|
-pub let response_file : String = ".moondiff-review-response.json"
+pub let response_file : String = ".moonreview-response.json"
 
 ///|
 /// OpenAI 兼容接口都是 base_url 再加一段路径；末尾多余的斜杠会拼出 `//v1//`

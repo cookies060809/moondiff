@@ -9,7 +9,7 @@
 
 ///|
 /// 密钥变量的读取顺序：自己的在前，通用的在后。
-let key_vars : Array[String] = ["MOONDIFF_API_KEY", "OPENAI_API_KEY"]
+let key_vars : Array[String] = ["MOONREVIEW_API_KEY", "OPENAI_API_KEY"]
 
 ///|
 fn nonempty_env(name : String) -> String? {
@@ -46,11 +46,11 @@ pub fn ask_for_review(d : @diff.Diff) -> (Bool, String) raise IoError {
     Some(k) => k
     None =>
       return (
-        false, "没有 API Key：先 export MOONDIFF_API_KEY=...（也认 OPENAI_API_KEY）",
+        false, "没有 API Key：先 export MOONREVIEW_API_KEY=...（也认 OPENAI_API_KEY）",
       )
   }
-  let base_url = @diff.resolve_base_url(nonempty_env("MOONDIFF_BASE_URL"))
-  let model = @diff.resolve_model(nonempty_env("MOONDIFF_MODEL"))
+  let base_url = @diff.resolve_base_url(nonempty_env("MOONREVIEW_BASE_URL"))
+  let model = @diff.resolve_model(nonempty_env("MOONREVIEW_MODEL"))
   write_text_file(@diff.body_file, d.chat_body(model))
   write_text_file(@diff.config_file, @diff.curl_config(base_url, api_key))
   let rc = run_command(@diff.curl_command)
