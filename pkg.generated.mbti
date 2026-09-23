@@ -37,6 +37,7 @@ pub fn Diff::hunk_count(Self) -> Int
 pub fn Diff::is_empty(Self) -> Bool
 pub fn Diff::not_equal(Self, Self) -> Bool
 pub fn Diff::removed_count(Self) -> Int
+pub fn Diff::review_prompt(Self) -> String
 pub fn Diff::to_json(Self) -> Json
 pub fn Diff::to_repr(Self) -> @debug.Repr
 pub fn Diff::touched_paths(Self) -> Array[String]

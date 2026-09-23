@@ -11,6 +11,7 @@ enum Mode {
   Detail
   Check
   Json
+  Review
 } derive(Eq, Debug)
 
 ///|
@@ -43,6 +44,7 @@ fn print_help() -> Unit {
     "  --stat          每个文件一行变更量（默认）",
     "  --detail, -d    逐文件打印状态、hunk 头和每一行",
     "  --json          输出结构化 JSON，给别的程序读",
+    "  --review-prompt 输出给大模型评审用的提示词（不调模型，只生成文本）",
     "  --check         只校验能不能解析，不输出内容",
     "  -h, --help      显示这份帮助",
     "  -V, --version   显示版本",
@@ -75,6 +77,8 @@ fn parse_args(argv : Array[String]) -> Parsed {
       mode = Detail
     } else if a == "--json" {
       mode = Json
+    } else if a == "--review-prompt" {
+      mode = Review
     } else if a == "--check" {
       mode = Check
     } else if a == "-" {
@@ -107,6 +111,7 @@ fn render(d : @diff.Diff, mode : Mode) -> Unit {
     Stat => println(d.format_stat())
     Detail => println(d.format_detail())
     Json => println(d.format_json())
+    Review => println(d.review_prompt())
     Check => ()
   }
 }

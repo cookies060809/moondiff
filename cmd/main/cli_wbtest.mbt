@@ -17,6 +17,7 @@ test "each output flag picks its mode" {
   assert_eq(parse_args(["-d"]), run_with(Detail, []))
   assert_eq(parse_args(["--detail"]), run_with(Detail, []))
   assert_eq(parse_args(["--check"]), run_with(Check, []))
+  assert_eq(parse_args(["--review-prompt"]), run_with(Review, []))
 }
 
 ///|
